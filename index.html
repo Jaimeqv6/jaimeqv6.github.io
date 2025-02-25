@@ -14,7 +14,7 @@
         <link rel="stylesheet" href="css/filter.css">
         <link rel="stylesheet" href="css/nouislider.min.css">
         <link rel="stylesheet" href="css/leaflet-measure.css">
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
             html, body, #map {
                 width: 100%;
@@ -24,20 +24,41 @@
             }
             #contador {
                 position: absolute;
-                bottom: 10px;
+                top: 10px;
                 right: 10px;
                 background: white;
                 padding: 10px;
-                border-radius: 0px;
-                box-shadow: 0 0 0px rgba(0,0,0,0.2);
+                border-radius: 5px;
+                box-shadow: 0 0 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+            }
+            #top-bar {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 10px;
+                background-color: cyan;
+                z-index: 1000;
+            }
+            #bottom-bar {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 40px;
+                background-color: blue;
                 z-index: 1000;
             }
         </style>
         <title>VISOR ARBOLADO</title>
     </head>
     <body>
+        <div id="top-bar"></div>
         <div id="map"></div>
-        <div id="contador">Nº de árboles: 5244</div>
+        <div id="contador">Número de árboles visibles: 0</div>
+        <canvas id="alturaChart" width="400" height="200" style="position: absolute; bottom: 50px; right: 10px; background: white; border: 1px solid #ccc;"></canvas>
+        <div id="bottom-bar"></div>
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
         <script src="js/L.Control.Layers.Tree.min.js"></script>
@@ -54,94 +75,67 @@
         <script src="js/nouislider.min.js"></script>
         <script src="js/wNumb.js"></script>
         <script src="data/ARBOLADO_2.js"></script>
-        
-<script>
-	// Función para generar el gráfico de barras
-function generarGraficoAltura() {
-    var alturas = {};
-    json_ARBOLADO_2.features.forEach(function(feature) {
-        var altura = feature.properties.ALTURA;
-        if (altura in alturas) {
-            alturas[altura]++;
-        } else {
-            alturas[altura] = 1;
-        }
-    });
-
-    var ctx = document.getElementById('alturaChart').getContext('2d');
-    var chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: Object.keys(alturas),
-            datasets: [{
-                label: 'Número de árboles',
-                data: Object.values(alturas),
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
+        <script>
+        // Función para contar los árboles visibles
+        function contarArbolesVisibles() {
+            var contador = 0;
+            layer_ARBOLADO_2.eachLayer(function(layer) {
+                if (map.hasLayer(layer)) {
+                    contador++;
                 }
-            }
+            });
+            return contador;
         }
-    });
-}
 
-// Llamar a la función para generar el gráfico
-generarGraficoAltura();
-// Función para contar los árboles visibles
-function contarArbolesVisibles() {
-    var contador = 0;
-    layer_ARBOLADO_2.eachLayer(function(layer) {
-        if (map.hasLayer(layer)) {
-            contador++;
+        // Función para actualizar el contador
+        function actualizarContador() {
+            var numeroDeArboles = contarArbolesVisibles();
+            document.getElementById('contador').innerText = "Número de árboles visibles: " + numeroDeArboles;
         }
-    });
-    return contador;
-}
 
-// Función para actualizar el contador
-function actualizarContador() {
-    var numeroDeArboles = contarArbolesVisibles();
-    document.getElementById('contador').innerText = "Número de árboles: " + numeroDeArboles;
-}
+        // Función para aplicar filtros
+        function aplicarFiltros() {
+            var especieSeleccionada = Array.from(document.getElementById('sel_ESPECIE').selectedOptions).map(option => option.value);
+            var lugarSeleccionado = Array.from(document.getElementById('sel_LUGAR').selectedOptions).map(option => option.value);
+            var alturaMin = parseFloat(document.getElementById('altura-slider').noUiSlider.get()[0]);
+            var alturaMax = parseFloat(document.getElementById('altura-slider').noUiSlider.get()[1]);
 
-// Función para aplicar filtros
-function aplicarFiltros() {
-    var especieSeleccionada = Array.from(document.getElementById('sel_ESPECIE').selectedOptions).map(option => option.value);
-    var lugarSeleccionado = Array.from(document.getElementById('sel_LUGAR').selectedOptions).map(option => option.value);
+            layer_ARBOLADO_2.clearLayers();
+            layer_ARBOLADO_2.addData(json_ARBOLADO_2.features.filter(feature => {
+                return (especieSeleccionada.length === 0 || especieSeleccionada.includes(feature.properties.ESPECIE)) &&
+                       (lugarSeleccionado.length === 0 || lugarSeleccionado.includes(feature.properties.LUGAR)) &&
+                       (feature.properties.ALTURA >= alturaMin && feature.properties.ALTURA <= alturaMax);
+            }));
+            actualizarContador();
+        }
 
-    layer_ARBOLADO_2.clearLayers();
-    layer_ARBOLADO_2.addData(json_ARBOLADO_2.features.filter(feature => {
-        return (especieSeleccionada.length === 0 || especieSeleccionada.includes(feature.properties.ESPECIE)) &&
-               (lugarSeleccionado.length === 0 || lugarSeleccionado.includes(feature.properties.LUGAR));
-    }));
-    actualizarContador();
-}
+        // Función para generar el gráfico de barras
+        function generarGraficoAltura() {
+            var alturas = {};
+            json_ARBOLADO_2.features.forEach(function(feature) {
+                var altura = feature.properties.ALTURA;
+                if (altura in alturas) {
+                    alturas[altura]++;
+                } else {
+                    alturas[altura] = 1;
+                }
+            });
 
-var highlightLayer;
-function highlightFeature(e) {
-    highlightLayer = e.target;
-    if (e.target.feature.geometry.type === 'LineString' || e.target.feature.geometry.type === 'MultiLineString') {
-        highlightLayer.setStyle({
-            color: '#ffff00',
-        });
-    } else {
-        highlightLayer.setStyle({
-            fillColor: '#ffff00',
-            fillOpacity: 1
-        });
-    }
-    highlightLayer.openPopup();
-}
-var map = L.map('map', {
-    zoomControl:false, maxZoom:28, minZoom:1
-}).fitBounds([[37.18280101116965,-3.651720061094775],[37.20228165181768,-3.613395899040727]]);
-var hash = new L.Hash(map);
+            var ctx = document.getElementById('alturaChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(alturas),
+                    datasets: [{
+                        label: 'Número de árboles',
+                        data: Object.values(alturas),
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options }).fitBounds([[37.18280101116965,-3.651720061094775],[37.20228165181768,-3.613395899040727]]);
+        var hash = new L.Hash(map);
 map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> · <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> · <a href="https://qgis.org">QGIS</a>');
 var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
 // remove popup's row if "visible-with-data"
