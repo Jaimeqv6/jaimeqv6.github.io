@@ -85,21 +85,6 @@ function aplicarFiltros() {
     actualizarContador();
 }
 
-var highlightLayer;
-function highlightFeature(e) {
-    highlightLayer = e.target;
-    if (e.target.feature.geometry.type === 'LineString' || e.target.feature.geometry.type === 'MultiLineString') {
-        highlightLayer.setStyle({
-            color: '#ffff00',
-        });
-    } else {
-        highlightLayer.setStyle({
-            fillColor: '#ffff00',
-            fillOpacity: 1
-        });
-    }
-    highlightLayer.openPopup();
-}
 var map = L.map('map', {
     zoomControl:false, maxZoom:28, minZoom:1
 }).fitBounds([[37.18280101116965,-3.651720061094775],[37.20228165181768,-3.613395899040727]]);
