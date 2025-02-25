@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="css/filter.css">
         <link rel="stylesheet" href="css/nouislider.min.css">
         <link rel="stylesheet" href="css/leaflet-measure.css">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
             html, body, #map {
                 width: 100%;
@@ -55,6 +56,43 @@
         <script src="data/ARBOLADO_2.js"></script>
         
 <script>
+	// Función para generar el gráfico de barras
+function generarGraficoAltura() {
+    var alturas = {};
+    json_ARBOLADO_2.features.forEach(function(feature) {
+        var altura = feature.properties.ALTURA;
+        if (altura in alturas) {
+            alturas[altura]++;
+        } else {
+            alturas[altura] = 1;
+        }
+    });
+
+    var ctx = document.getElementById('alturaChart').getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(alturas),
+            datasets: [{
+                label: 'Número de árboles',
+                data: Object.values(alturas),
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Llamar a la función para generar el gráfico
+generarGraficoAltura();
 // Función para contar los árboles visibles
 function contarArbolesVisibles() {
     var contador = 0;
@@ -691,5 +729,6 @@ ESPECIE_options_str  += '<option value="Quercus ilex">Quercus ilex</option>';
 	<div id="logo-container" style="position: absolute; bottom: 45px; right: 4px; z-index: 700;">
     <img src="data/logo.png" alt="Logo de la empresa" style="width: 150px; height: auto;">
 </div>    
+	    <canvas id="alturaChart" width="400" height="200" style="position: absolute; bottom: 50px; right: 10px; background: white; border: 1px solid #ccc;"></canvas>
     </body>
 </html>
