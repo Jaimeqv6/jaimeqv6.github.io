@@ -187,7 +187,7 @@ var layer_MapaBase_1 = L.tileLayer('https://a.basemaps.cartocdn.com/light_all/{z
 layer_MapaBase_1;
 map.addLayer(layer_MapaBase_1);
 function pop_ARBOLADO_2(feature, layer) {
-layer.on({
+layer.off({
 mouseout: function(e) {
             for (var i in e.target._eventParents) {
                 if (typeof e.target._eventParents[i].resetStyle === 'function') {
