@@ -183,26 +183,6 @@
             minNativeZoom: 0,
             maxNativeZoom: 20
         });
-        layer_MapaBase_1;
-        map.addLayer(layer_MapaBase_1);
-        function pop_ARBOLADO_2(feature, layer) {
-            layer.on({
-                mouseout: function(e) {
-                    for (var i in e.target._eventParents) {
-                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
-                            e.target._eventParents[i].resetStyle(e.target);
-                        }
-                    }
-                    if (typeof layer.closePopup == 'function') {
-                        layer.closePopup();
-                    } else {
-                        layer.eachLayer(function(feature){
-                            feature.closePopup()
-                        });
-                    }
-                },
-                mouseover: highlightFeature,
-            });
             var popupContent = '<table>\
                     <tr>\
                         <th scope="row">ESPECIE</th>\
