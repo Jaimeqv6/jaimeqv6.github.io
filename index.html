@@ -84,19 +84,6 @@ function aplicarFiltros() {
     }));
     actualizarContador();
 }
-
-var highlightLayer;
-function highlightFeature(e) {
-    highlightLayer = e.target;
-    if (e.target.feature.geometry.type === 'LineString' || e.target.feature.geometry.type === 'MultiLineString') {
-        highlightLayer.setStyle({
-            color: '#ffff00',
-        });
-    } else {
-        highlightLayer.setStyle({
-            fillColor: '#ffff00',
-            fillOpacity: 1
-        });
     }
     highlightLayer.openPopup();
 }
