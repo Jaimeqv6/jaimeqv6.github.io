@@ -706,7 +706,7 @@ ESPECIE_options_str  += '<option value="Quercus ilex">Quercus ilex</option>';
       alert("Acceso permitido");
       document.getElementById("contenidoProtegido").style.display = "block";
 
-      // Ajustado a 500ms para asegurar carga completa
+      // Fuerza a leaflet a recalcular tamaño de mapa después de mostrar todo el contenido.
       setTimeout(function(){
         map.invalidateSize();
       }, 500);
@@ -717,10 +717,12 @@ ESPECIE_options_str  += '<option value="Quercus ilex">Quercus ilex</option>';
     }
   }
 
-  // Asegurar ocultamiento inmediato
-  document.getElementById("contenidoProtegido").style.display = "none";
+  // Oculta contenido mediante CSS hasta que todo haya cargado
+  document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("contenidoProtegido").style.display = "none";
+  });
 
-  // Ejecutar autenticación tras carga completa
+  // Autenticación y visualización del mapa después de carga COMPLETA
   window.onload = function() {
     pedirCredenciales();
   };
