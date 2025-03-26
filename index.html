@@ -31,6 +31,15 @@
                 box-shadow: 0 0 15px rgba(0,0,0,0.2);
                 z-index: 1000;
             }
+		#contenidoProtegido {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out;
+}
+#contenidoProtegido.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
         </style>
         <title>VISOR ARBOLADO</title>
     </head>
@@ -704,9 +713,11 @@ ESPECIE_options_str  += '<option value="Quercus ilex">Quercus ilex</option>';
 
     if (usuario === usuarioCorrecto && password === passwordCorrecto) {
       alert("Acceso permitido");
-      document.getElementById("contenidoProtegido").style.display = "block";
+      
+      const contenido = document.getElementById("contenidoProtegido");
+      contenido.classList.add('visible');
 
-      // Fuerza a leaflet a recalcular tamaño de mapa después de mostrar todo el contenido.
+      // Fuerza a leaflet a recalcular tamaño después de mostrar contenido
       setTimeout(function(){
         map.invalidateSize();
       }, 500);
@@ -717,16 +728,11 @@ ESPECIE_options_str  += '<option value="Quercus ilex">Quercus ilex</option>';
     }
   }
 
-  // Oculta contenido mediante CSS hasta que todo haya cargado
-  document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("contenidoProtegido").style.display = "none";
-  });
-
-  // Autenticación y visualización del mapa después de carga COMPLETA
   window.onload = function() {
     pedirCredenciales();
   };
 </script>
+
 
     </body>
 </html>
