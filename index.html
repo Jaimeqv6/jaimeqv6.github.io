@@ -692,6 +692,7 @@ ESPECIE_options_str  += '<option value="Quercus ilex">Quercus ilex</option>';
 	<div id="logo-container" style="position: absolute; bottom: 1px; right: 4px; z-index: 700;">
     <img src="data/logo.png" alt="Logo de la empresa" style="width: 150px; height: auto;">
 </div>  
+</div>
 
 <script>
   const usuarioCorrecto = "1234";
@@ -704,20 +705,23 @@ ESPECIE_options_str  += '<option value="Quercus ilex">Quercus ilex</option>';
     if (usuario === usuarioCorrecto && password === passwordCorrecto) {
       alert("Acceso permitido");
       document.getElementById("contenidoProtegido").style.display = "block";
-      
-      // SOLUCIÓN: Forzar a Leaflet a recalcular el tamaño del mapa tras hacerlo visible
+
+      // Ajustado a 500ms para asegurar carga completa
       setTimeout(function(){
-          map.invalidateSize();
-      }, 100);
-      
+        map.invalidateSize();
+      }, 500);
+
     } else {
       alert("Credenciales incorrectas. Vuelve a intentarlo.");
       pedirCredenciales();
     }
   }
 
+  // Asegurar ocultamiento inmediato
+  document.getElementById("contenidoProtegido").style.display = "none";
+
+  // Ejecutar autenticación tras carga completa
   window.onload = function() {
-    document.getElementById("contenidoProtegido").style.display = "none";
     pedirCredenciales();
   };
 </script>
