@@ -35,6 +35,7 @@
         <title>VISOR ARBOLADO</title>
     </head>
     <body>
+	<div id="contenidoProtegido">    
         <div id="map"></div>
         <div id="contador">Nº de árboles: 5244</div>
         <script src="js/qgis2web_expressions.js"></script>
@@ -690,6 +691,30 @@ ESPECIE_options_str  += '<option value="Quercus ilex">Quercus ilex</option>';
         </script>
 	<div id="logo-container" style="position: absolute; bottom: 1px; right: 4px; z-index: 700;">
     <img src="data/logo.png" alt="Logo de la empresa" style="width: 150px; height: auto;">
-</div>    
+</div>  
+
+<script>
+  const usuarioCorrecto = "1234";
+  const passwordCorrecto = "1234";
+
+  function pedirCredenciales() {
+    const usuario = prompt("Introduce el usuario:");
+    const password = prompt("Introduce la contraseña:");
+
+    if (usuario === usuarioCorrecto && password === passwordCorrecto) {
+      alert("Acceso permitido");
+      document.getElementById("contenidoProtegido").style.display = "block";
+    } else {
+      alert("Credenciales incorrectas. Vuelve a intentarlo.");
+      pedirCredenciales();
+    }
+  }
+
+  window.onload = function() {
+    document.getElementById("contenidoProtegido").style.display = "none";
+    pedirCredenciales();
+  };
+</script>
+
     </body>
 </html>
