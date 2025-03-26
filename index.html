@@ -704,6 +704,12 @@ ESPECIE_options_str  += '<option value="Quercus ilex">Quercus ilex</option>';
     if (usuario === usuarioCorrecto && password === passwordCorrecto) {
       alert("Acceso permitido");
       document.getElementById("contenidoProtegido").style.display = "block";
+      
+      // SOLUCIÓN: Forzar a Leaflet a recalcular el tamaño del mapa tras hacerlo visible
+      setTimeout(function(){
+          map.invalidateSize();
+      }, 100);
+      
     } else {
       alert("Credenciales incorrectas. Vuelve a intentarlo.");
       pedirCredenciales();
