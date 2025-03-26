@@ -15,34 +15,31 @@
         <link rel="stylesheet" href="css/nouislider.min.css">
         <link rel="stylesheet" href="css/leaflet-measure.css">
         <style>
-            html, body, #map {
-                width: 100%;
-                height: 100%;
-                padding: 0;
-                margin: 0;
-            }
-            #contador {
-                position: absolute;
-                bottom: 10px;
-                left: 10px;
-                background: white;
-                padding: 10px;
-                border-radius: 5px;
-                box-shadow: 0 0 15px rgba(0,0,0,0.2);
-                z-index: 1000;
-            }
-		#contenidoProtegido {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s ease-in-out;
+            html, body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
 #contenidoProtegido {
-  opacity: 0;
+  visibility: hidden; /* importante no usar display:none ni opacity */
   pointer-events: none;
   position: absolute;
-  top: 0; 
-  left: 0; 
-  right: 0; 
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+  z-index: 9999;
+  background: white;
+}
+
+#contenidoProtegido.visible {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#map, #all, #mapWindow {
+  width: 100%;
+  height: 100%;
 }
 
 
@@ -711,25 +708,28 @@ ESPECIE_options_str  += '<option value="Quercus ilex">Quercus ilex</option>';
 
 <script>
 window.onload = function(){
-  const usuario = prompt("Introduce el usuario:");
-  const pass = prompt("Introduce la contraseña:");
+  const usuario = prompt("Introduce usuario:");
+  const pass = prompt("Introduce contraseña:");
 
   if(usuario=="1234" && pass=="1234"){
     alert("Acceso permitido");
 
-    document.getElementById('contenidoProtegido').style.opacity = "1";
-    document.getElementById('contenidoProtegido').style.pointerEvents = "auto";
+    const contenido = document.getElementById('contenidoProtegido');
+    contenido.classList.add("visible");
 
-    // Recalcular tamaño del mapa después de hacerlo visible
-    setTimeout(function(){
+    // Forzar repetidamente recalculo del mapa durante 2 segundos completos
+    let intentos = 0;
+    let recalculo = setInterval(function(){
       map.invalidateSize();
-    },500);
+      intentos++;
+      if(intentos > 20){ clearInterval(recalculo); }
+    }, 100);
 
-  } else {
+  }else{
     alert("Datos incorrectos");
     location.reload();
   }
-}
+};
 </script>
 
     </body>
